@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Asientos de Nóminas - Gextia</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --success: #00cc88;
+            --danger: #ff4444;
+            --text: #1a1a2e;
+            --text-light: #6b7280;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, #00cc88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #00b377;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 204, 136, 0.3);
+        }
+
+        .file-info {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-info.visible {
+            display: block;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .file-details {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .summary {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .summary.visible {
+            display: block;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .alert.visible {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid var(--success);
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid var(--danger);
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #1a1a2e;
+            color: #00cc88;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Generador de Asientos de Nóminas</h1>
+            <p class="subtitle">Convierte tu Excel de nóminas al formato de importación de Gextia</p>
+        </header>
+
+        <div class="card">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Arrastra tu archivo de nóminas aquí</div>
+                <div class="upload-hint">o haz clic para seleccionar (Excel .xlsx)</div>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx">
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-name" id="fileName"></div>
+                <div class="file-details" id="fileDetails"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 25px;">⚙️ Configuración del Asiento</h2>
+            
+            <div class="form-group">
+                <label for="fecha">Fecha del asiento</label>
+                <input type="date" id="fecha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="referencia">Referencia</label>
+                <input type="text" id="referencia" placeholder="Ej: Nómina enero 2026" required>
+            </div>
+
+            <div class="form-group">
+                <label for="diario">Diario contable</label>
+                <input type="text" id="diario" value="Nóminas" required>
+            </div>
+
+            <button class="btn btn-primary" id="generateBtn" disabled>
+                <span>🔄</span>
+                <span>Generar Asiento Contable</span>
+            </button>
+
+            <div class="summary" id="summary">
+                <h3 style="margin-bottom: 15px;">📈 Resumen del Asiento</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Empleados</div>
+                        <div class="summary-value" id="totalEmpleados">0</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Bruto</div>
+                        <div class="summary-value" id="totalBruto">0 €</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Líquido</div>
+                        <div class="summary-value" id="totalLiquido">0 €</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">SS Empresa</div>
+                        <div class="summary-value" id="totalSSEmpresa">0 €</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Procesando nóminas...</p>
+            </div>
+
+            <div class="alert alert-success" id="successAlert">
+                <strong>✅ ¡Perfecto!</strong> El archivo se ha generado correctamente.
+            </div>
+
+            <div class="alert alert-error" id="errorAlert">
+                <strong>❌ Error:</strong> <span id="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Desarrollado para facilitar la importación de nóminas en <span class="code">Gextia ERP</span></p>
+    </footer>
+
+    <script>
+        let nominasData = null;
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileDetails = document.getElementById('fileDetails');
+        const generateBtn = document.getElementById('generateBtn');
+        const summary = document.getElementById('summary');
+        const loading = document.getElementById('loading');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Configurar fecha por defecto (último día del mes anterior)
+        const today = new Date();
+        const lastDayPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        document.getElementById('fecha').valueAsDate = lastDayPrevMonth;
+
+        // Configurar referencia por defecto
+        const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                           'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const prevMonth = lastDayPrevMonth.getMonth();
+        const year = lastDayPrevMonth.getFullYear();
+        document.getElementById('referencia').value = `Nómina ${monthNames[prevMonth]} ${year}`;
+
+        // Upload zone events
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.xlsx')) {
+                showError('Por favor selecciona un archivo Excel (.xlsx)');
+                return;
+            }
+
+            fileName.textContent = file.name;
+            fileDetails.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+            fileInfo.classList.add('visible');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    processNominas(workbook);
+                } catch (error) {
+                    showError('Error al leer el archivo: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processNominas(workbook) {
+            try {
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+                // Encontrar la fila de encabezados (fila 6, índice 5)
+                const headerRow = 5;
+                const headers = data[headerRow];
+
+                // Encontrar índices de columnas importantes
+                const colIndices = {
+                    numEmpleado: 1,
+                    totBruto: findColumnIndex(headers, 'TOT. BRUTO'),
+                    totDeduc: findColumnIndex(headers, 'TOT.DEDUC.'),
+                    totalLiq: findColumnIndex(headers, 'TOTAL.LIQ.'),
+                    ssEmpresa: findColumnIndex(headers, 'SS EMPRESA'),
+                    ssTotal: findColumnIndex(headers, 'SS TOTAL.'),
+                    irpfDin: findColumnIndex(headers, 'B.IRPF DIN'),
+                    irpfEsp: findColumnIndex(headers, 'B.IRPF ESP'),
+                    irpfIrr: findColumnIndex(headers, 'B.IRPF IRR'),
+                };
+
+                // Extraer datos de empleados (empiezan en fila 8, índice 7)
+                const empleados = [];
+                for (let i = 7; i < data.length; i++) {
+                    const row = data[i];
+                    if (!row || !row[colIndices.numEmpleado]) continue;
+
+                    const numEmp = row[colIndices.numEmpleado];
+                    if (typeof numEmp !== 'number' && !numEmp) continue;
+
+                    const empleado = {
+                        numero: String(numEmp).padStart(6, '0'),
+                        totBruto: parseValue(row[colIndices.totBruto]),
+                        totDeduc: parseValue(row[colIndices.totDeduc]),
+                        totalLiq: parseValue(row[colIndices.totalLiq]),
+                        ssEmpresa: parseValue(row[colIndices.ssEmpresa]),
+                        ssTotal: parseValue(row[colIndices.ssTotal]),
+                        irpfDin: parseValue(row[colIndices.irpfDin]),
+                        irpfEsp: parseValue(row[colIndices.irpfEsp]),
+                        irpfIrr: parseValue(row[colIndices.irpfIrr]),
+                    };
+
+                    // Calcular base exenta (TOT.BRUTO - suma de bases IRPF)
+                    empleado.baseExenta = empleado.totBruto - empleado.irpfDin - empleado.irpfEsp - empleado.irpfIrr;
+
+                    empleados.push(empleado);
+                }
+
+                if (empleados.length === 0) {
+                    showError('No se encontraron datos de empleados en el archivo');
+                    return;
+                }
+
+                nominasData = empleados;
+                showSummary(empleados);
+                generateBtn.disabled = false;
+                hideError();
+
+            } catch (error) {
+                showError('Error al procesar el archivo: ' + error.message);
+            }
+        }
+
+        function findColumnIndex(headers, columnName) {
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i] && headers[i].toString().includes(columnName)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function parseValue(val) {
+            if (val === null || val === undefined || val === '') return 0;
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string') {
+                // Eliminar comas y convertir
+                return parseFloat(val.replace(/,/g, '')) || 0;
+            }
+            return 0;
+        }
+
+        function showSummary(empleados) {
+            const totales = empleados.reduce((acc, emp) => ({
+                empleados: acc.empleados + 1,
+                bruto: acc.bruto + emp.totBruto,
+                liquido: acc.liquido + emp.totalLiq,
+                ssEmpresa: acc.ssEmpresa + emp.ssEmpresa,
+            }), { empleados: 0, bruto: 0, liquido: 0, ssEmpresa: 0 });
+
+            document.getElementById('totalEmpleados').textContent = totales.empleados;
+            document.getElementById('totalBruto').textContent = formatCurrency(totales.bruto);
+            document.getElementById('totalLiquido').textContent = formatCurrency(totales.liquido);
+            document.getElementById('totalSSEmpresa').textContent = formatCurrency(totales.ssEmpresa);
+
+            summary.classList.add('visible');
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-ES', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 2,
+            }).format(value);
+        }
+
+        generateBtn.addEventListener('click', generateAsiento);
+
+        function generateAsiento() {
+            if (!nominasData) {
+                showError('Primero debes cargar un archivo de nóminas');
+                return;
+            }
+
+            const fecha = document.getElementById('fecha').value;
+            const referencia = document.getElementById('referencia').value;
+            const diario = document.getElementById('diario').value;
+
+            if (!fecha || !referencia || !diario) {
+                showError('Por favor completa todos los campos');
+                return;
+            }
+
+            loading.classList.add('visible');
+            hideError();
+            successAlert.classList.remove('visible');
+
+            setTimeout(() => {
+                try {
+                    const asientoData = generarDatosAsiento(nominasData, fecha, referencia, diario);
+                    const wb = crearExcelAsiento(asientoData);
+                    descargarExcel(wb, `Asiento_Nominas_${referencia.replace(/\s+/g, '_')}.xlsx`);
+
+                    loading.classList.remove('visible');
+                    successAlert.classList.add('visible');
+                } catch (error) {
+                    loading.classList.remove('visible');
+                    showError('Error al generar el asiento: ' + error.message);
+                }
+            }, 500);
+        }
+
+        function generarDatosAsiento(empleados, fecha, referencia, diario) {
+            // Calcular totales
+            const totales = empleados.reduce((acc, emp) => ({
+                irpfDin: acc.irpfDin + emp.irpfDin,
+                irpfEsp: acc.irpfEsp + emp.irpfEsp,
+                irpfIrr: acc.irpfIrr + emp.irpfIrr,
+                baseExenta: acc.baseExenta + emp.baseExenta,
+                ssEmpresa: acc.ssEmpresa + emp.ssEmpresa,
+                ssTotal: acc.ssTotal + emp.ssTotal,
+            }), { irpfDin: 0, irpfEsp: 0, irpfIrr: 0, baseExenta: 0, ssEmpresa: 0, ssTotal: 0 });
+
+            const asiento = [];
+
+            // DEBE - Cuenta 640 (Sueldos y salarios) - Base dineraria
+            if (totales.irpfDin > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 6400000000,
+                    etiqueta: 'Sueldos y salarios (dinerarios)',
+                    debe: totales.irpfDin,
+                    haber: null,
+                    impuestos: 'Retenciones IRPF (Trabajadores) dinerarios',
+                    empresa: null,
+                });
+            }
+
+            // DEBE - Cuenta 640 - Base en especie
+            if (totales.irpfEsp > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 6400000000,
+                    etiqueta: 'Sueldos y salarios (en especie)',
+                    debe: totales.irpfEsp,
+                    haber: null,
+                    impuestos: 'Retenciones IRPF (Trabajadores) en especie',
+                    empresa: null,
+                });
+            }
+
+            // DEBE - Cuenta 640 - Base irregular
+            if (totales.irpfIrr > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 6400000000,
+                    etiqueta: 'Sueldos y salarios (irregulares)',
+                    debe: totales.irpfIrr,
+                    haber: null,
+                    impuestos: 'Retenciones IRPF (Trabajadores) dinerarios',
+                    empresa: null,
+                });
+            }
+
+            // DEBE - Cuenta 640 - Base exenta
+            if (totales.baseExenta > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 6400000000,
+                    etiqueta: 'Sueldos y salarios (exentos)',
+                    debe: totales.baseExenta,
+                    haber: null,
+                    impuestos: null,
+                    empresa: null,
+                });
+            }
+
+            // DEBE - Cuenta 642 (Seguridad Social a cargo empresa)
+            if (totales.ssEmpresa > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 6420000000,
+                    etiqueta: 'Seguridad Social a cargo empresa',
+                    debe: totales.ssEmpresa,
+                    haber: null,
+                    impuestos: null,
+                    empresa: null,
+                });
+            }
+
+            // HABER - Cuenta 476 (Seguridad Social acreedora)
+            if (totales.ssTotal > 0) {
+                asiento.push({
+                    fecha,
+                    referencia,
+                    diario,
+                    cuenta: 4760000000,
+                    etiqueta: 'Seguridad Social acreedora',
+                    debe: null,
+                    haber: totales.ssTotal,
+                    impuestos: null,
+                    empresa: null,
+                });
+            }
+
+            // HABER - Cuenta 465 (Remuneraciones pendientes) - UNA LÍNEA POR EMPLEADO
+            empleados.forEach(emp => {
+                if (emp.totalLiq > 0) {
+                    asiento.push({
+                        fecha,
+                        referencia,
+                        diario,
+                        cuenta: 4650000000,
+                        etiqueta: `Nómina Emp. ${emp.numero}`,
+                        debe: null,
+                        haber: emp.totalLiq,
+                        impuestos: null,
+                        empresa: parseInt(emp.numero),
+                    });
+                }
+            });
+
+            return asiento;
+        }
+
+        function crearExcelAsiento(asiento) {
+            const ws_data = [
+                ['Fecha', 'Referencia', 'Diario', 'Apuntes contables/Cuenta', 
+                 'Apuntes Contables/Etiqueta', 'Apuntes contables/Debe', 
+                 'Apuntes contables/Haber', 'Apuntes contables/Impuestos', 'Empresa ']
+            ];
+
+            asiento.forEach((linea, index) => {
+                ws_data.push([
+                    index === 0 ? linea.fecha : null,
+                    index === 0 ? linea.referencia : null,
+                    index === 0 ? linea.diario : null,
+                    linea.cuenta,
+                    linea.etiqueta,
+                    linea.debe,
+                    linea.haber,
+                    linea.impuestos,
+                    linea.empresa,
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+            // Ajustar anchos de columna
+            ws['!cols'] = [
+                { wch: 12 },  // Fecha
+                { wch: 20 },  // Referencia
+                { wch: 12 },  // Diario
+                { wch: 20 },  // Cuenta
+                { wch: 35 },  // Etiqueta
+                { wch: 15 },  // Debe
+                { wch: 15 },  // Haber
+                { wch: 45 },  // Impuestos
+                { wch: 10 },  // Empresa
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Asiento Nóminas');
+
+            return wb;
+        }
+
+        function descargarExcel(wb, filename) {
+            XLSX.writeFile(wb, filename);
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorAlert.classList.add('visible');
+        }
+
+        function hideError() {
+            errorAlert.classList.remove('visible');
+        }
+    </script>
+</body>
+</html>
