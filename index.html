@@ -39,7 +39,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 40px 24px;
         }
@@ -52,7 +52,7 @@
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 24px;
             display: flex;
@@ -75,6 +75,42 @@
             font-size: 14px;
             color: var(--gray-500);
             font-weight: 400;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--gray-500);
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--dark);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         h1 {
@@ -104,10 +140,17 @@
         .card-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--gray-100);
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .card-icon {
@@ -234,6 +277,25 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: #EFF6FF;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
         }
 
         .file-info {
@@ -382,6 +444,66 @@
             color: var(--primary);
         }
 
+        .table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--gray-50);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--gray-300);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #ECFDF5;
+            color: #065F46;
+        }
+
+        .badge-info {
+            background: #EFF6FF;
+            color: #1E40AF;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
         .alert {
             padding: 16px 20px;
             border-radius: 8px;
@@ -408,6 +530,12 @@
             color: #991B1B;
         }
 
+        .alert-info {
+            background: #EFF6FF;
+            border-color: var(--primary);
+            color: #1E40AF;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
@@ -431,6 +559,16 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            font-size: 14px;
         }
 
         footer {
@@ -461,6 +599,10 @@
             .dist-grid {
                 grid-template-columns: 1fr;
             }
+
+            .nav-tabs {
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
@@ -476,99 +618,164 @@
 
     <div class="container">
         <h1>Generador de Asientos de Nóminas</h1>
-        <p class="subtitle">Procesamiento automático con distribución analítica para Gextia ERP</p>
+        <p class="subtitle">Sistema completo con base de datos de empleados e histórico</p>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">📊</div>
-                <div class="card-title">Cargar Archivo de Nóminas</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('nominas')">📊 Procesar Nóminas</button>
+            <button class="nav-tab" onclick="switchTab('empleados')">👥 Base de Datos Empleados</button>
+            <button class="nav-tab" onclick="switchTab('historico')">📜 Histórico</button>
+        </div>
+
+        <!-- TAB: PROCESAR NÓMINAS -->
+        <div id="tab-nominas" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">Cargar Archivo de Nóminas</div>
+                    </div>
+                </div>
+
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Arrastra tu archivo aquí</div>
+                    <div class="upload-hint">o haz clic para seleccionar un archivo Excel (.xlsx)</div>
+                </div>
+                <input type="file" id="fileInput" accept=".xlsx">
+
+                <div class="file-info" id="fileInfo">
+                    <div class="file-icon">✓</div>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">📁</div>
-                <div class="upload-text">Arrastra tu archivo aquí</div>
-                <div class="upload-hint">o haz clic para seleccionar un archivo Excel (.xlsx)</div>
-            </div>
-            <input type="file" id="fileInput" accept=".xlsx">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-icon">⚙️</div>
+                        <div class="card-title">Configuración del Asiento</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha">Fecha del asiento</label>
+                    <input type="date" id="fecha" required>
+                </div>
 
-            <div class="file-info" id="fileInfo">
-                <div class="file-icon">✓</div>
-                <div class="file-details">
-                    <div class="file-name" id="fileName"></div>
-                    <div class="file-size" id="fileSize"></div>
+                <div class="form-group">
+                    <label for="referencia">Referencia</label>
+                    <input type="text" id="referencia" placeholder="Ej: Nómina enero 2026" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="diario">Diario contable</label>
+                    <input type="text" id="diario" value="Nóminas" required>
+                </div>
+
+                <button class="btn btn-primary" id="generateBtn" disabled>
+                    <span>→</span>
+                    <span>Generar Asiento Contable</span>
+                </button>
+
+                <div class="summary" id="summary">
+                    <h3>Resumen del Procesamiento</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Empleados</div>
+                            <div class="summary-value" id="totalEmpleados">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Bruto</div>
+                            <div class="summary-value" id="totalBruto">0 €</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Líquido</div>
+                            <div class="summary-value" id="totalLiquido">0 €</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">SS Empresa</div>
+                            <div class="summary-value" id="totalSSEmpresa">0 €</div>
+                        </div>
+                    </div>
+
+                    <div class="distribution-section">
+                        <div class="distribution-title">
+                            <span>📈</span>
+                            <span>Distribución Analítica</span>
+                        </div>
+                        <div class="dist-grid" id="distributionGrid"></div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Procesando nóminas y generando asiento...</p>
+                </div>
+
+                <div class="alert alert-success" id="successAlert">
+                    <strong>✓</strong>
+                    <span>Asiento generado correctamente. El archivo se ha descargado.</span>
+                </div>
+
+                <div class="alert alert-error" id="errorAlert">
+                    <strong>⚠</strong>
+                    <span id="errorMessage"></span>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">⚙️</div>
-                <div class="card-title">Configuración del Asiento</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="fecha">Fecha del asiento</label>
-                <input type="date" id="fecha" required>
-            </div>
-
-            <div class="form-group">
-                <label for="referencia">Referencia</label>
-                <input type="text" id="referencia" placeholder="Ej: Nómina enero 2026" required>
-            </div>
-
-            <div class="form-group">
-                <label for="diario">Diario contable</label>
-                <input type="text" id="diario" value="Nóminas" required>
-            </div>
-
-            <button class="btn btn-primary" id="generateBtn" disabled>
-                <span>→</span>
-                <span>Generar Asiento Contable</span>
-            </button>
-
-            <div class="summary" id="summary">
-                <h3>Resumen del Procesamiento</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="summary-label">Empleados</div>
-                        <div class="summary-value" id="totalEmpleados">0</div>
+        <!-- TAB: BASE DE DATOS EMPLEADOS -->
+        <div id="tab-empleados" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-icon">👥</div>
+                        <div class="card-title">Base de Datos de Empleados</div>
                     </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Bruto</div>
-                        <div class="summary-value" id="totalBruto">0 €</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Líquido</div>
-                        <div class="summary-value" id="totalLiquido">0 €</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">SS Empresa</div>
-                        <div class="summary-value" id="totalSSEmpresa">0 €</div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="exportarEmpleados()">
+                            <span>↓</span>
+                            <span>Exportar</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="document.getElementById('importEmpleadosInput').click()">
+                            <span>↑</span>
+                            <span>Importar Excel</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="distribution-section">
-                    <div class="distribution-title">
-                        <span>📈</span>
-                        <span>Distribución Analítica</span>
-                    </div>
-                    <div class="dist-grid" id="distributionGrid"></div>
+                <input type="file" id="importEmpleadosInput" accept=".xlsx" style="display:none">
+
+                <div class="alert alert-info" id="empleadosInfo" style="display:none">
+                    <strong>ℹ</strong>
+                    <span id="empleadosInfoText"></span>
+                </div>
+
+                <div class="table-container" id="empleadosTableContainer">
+                    <!-- Tabla de empleados se genera dinámicamente -->
                 </div>
             </div>
+        </div>
 
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Procesando nóminas y generando asiento...</p>
-            </div>
+        <!-- TAB: HISTÓRICO -->
+        <div id="tab-historico" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-icon">📜</div>
+                        <div class="card-title">Histórico de Asientos Generados</div>
+                    </div>
+                    <button class="btn btn-danger btn-icon" onclick="limpiarHistorico()" title="Limpiar histórico">
+                        🗑️
+                    </button>
+                </div>
 
-            <div class="alert alert-success" id="successAlert">
-                <strong>✓</strong>
-                <span>Asiento generado correctamente. El archivo se ha descargado.</span>
-            </div>
-
-            <div class="alert alert-error" id="errorAlert">
-                <strong>⚠</strong>
-                <span id="errorMessage"></span>
+                <div id="historicoContainer">
+                    <!-- Histórico se genera dinámicamente -->
+                </div>
             </div>
         </div>
     </div>
@@ -579,7 +786,19 @@
     </footer>
 
     <script>
-        let nominasData = null;
+        // SISTEMA DE ALMACENAMIENTO
+        const DB = {
+            getEmpleados: () => JSON.parse(localStorage.getItem('empleados') || '{}'),
+            setEmpleados: (data) => localStorage.setItem('empleados', JSON.stringify(data)),
+            getHistorico: () => JSON.parse(localStorage.getItem('historico') || '[]'),
+            addHistorico: (entry) => {
+                const hist = DB.getHistorico();
+                hist.unshift(entry);
+                if (hist.length > 50) hist.pop(); // Máximo 50 entradas
+                localStorage.setItem('historico', JSON.stringify(hist));
+            },
+            clearHistorico: () => localStorage.setItem('historico', '[]')
+        };
 
         const DEPARTAMENTOS = {
             1: 'Logística',
@@ -598,6 +817,10 @@
             5: 'Almacén Badalona'
         };
 
+        let nominasData = null;
+        let currentDistribucion = null;
+
+        // ELEMENTOS DOM
         const uploadZone = document.getElementById('uploadZone');
         const fileInput = document.getElementById('fileInput');
         const fileInfo = document.getElementById('fileInfo');
@@ -609,7 +832,9 @@
         const successAlert = document.getElementById('successAlert');
         const errorAlert = document.getElementById('errorAlert');
         const errorMessage = document.getElementById('errorMessage');
+        const importEmpleadosInput = document.getElementById('importEmpleadosInput');
 
+        // INICIALIZACIÓN
         const today = new Date();
         const lastDayPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
         document.getElementById('fecha').valueAsDate = lastDayPrevMonth;
@@ -620,6 +845,7 @@
         const year = lastDayPrevMonth.getFullYear();
         document.getElementById('referencia').value = `Nómina ${monthNames[prevMonth]} ${year}`;
 
+        // EVENTOS
         uploadZone.addEventListener('click', () => fileInput.click());
         uploadZone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -635,6 +861,25 @@
             if (e.target.files.length > 0) handleFile(e.target.files[0]);
         });
 
+        importEmpleadosInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) importarEmpleados(e.target.files[0]);
+        });
+
+        generateBtn.addEventListener('click', generateAsiento);
+
+        // FUNCIONES DE TABS
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            if (tabName === 'empleados') cargarTablaEmpleados();
+            if (tabName === 'historico') cargarHistorico();
+        }
+
+        // FUNCIONES DE PROCESAMIENTO DE NÓMINAS
         function handleFile(file) {
             if (!file.name.endsWith('.xlsx')) {
                 showError('Por favor selecciona un archivo Excel (.xlsx)');
@@ -663,7 +908,7 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
 
-                const headerRow = 6; // Fila 7 en Excel (índice 6)
+                const headerRow = 6;
                 const headers = data[headerRow];
 
                 const colIndices = {
@@ -685,18 +930,31 @@
                     anticipo: 25,
                 };
 
+                const empleadosDB = DB.getEmpleados();
                 const empleados = [];
-                for (let i = 8; i < data.length; i++) { // Datos empiezan en fila 9 (índice 8)
+                
+                for (let i = 8; i < data.length; i++) {
                     const row = data[i];
                     if (!row || !row[colIndices.numEmpleado]) continue;
 
                     const numEmp = row[colIndices.numEmpleado];
                     if (!numEmp) continue;
 
+                    const numEmpleadoStr = String(numEmp).padStart(6, '0');
+
+                    // Usar departamento/centro del archivo o de la BD
+                    let departamento = parseInt(row[colIndices.departamento]) || 0;
+                    let centro = String(row[colIndices.centro] || '').trim();
+
+                    if (empleadosDB[numEmpleadoStr]) {
+                        if (!departamento) departamento = empleadosDB[numEmpleadoStr].departamento;
+                        if (!centro) centro = empleadosDB[numEmpleadoStr].centro;
+                    }
+
                     const empleado = {
-                        numero: String(numEmp).padStart(6, '0'),
-                        departamento: parseInt(row[colIndices.departamento]) || 0,
-                        centro: String(row[colIndices.centro] || '').trim(),
+                        numero: numEmpleadoStr,
+                        departamento,
+                        centro,
                         totBruto: parseValue(row[colIndices.totBruto]),
                         totalLiq: parseValue(row[colIndices.totalLiq]),
                         ssEmpresa: parseValue(row[colIndices.ssEmpresa]),
@@ -715,10 +973,8 @@
                     empleado.baseExenta = empleado.totBruto - empleado.irpfDin - empleado.irpfEsp - empleado.irpfIrr;
                     empleado.seguroMTotal = empleado.seguroM1 + empleado.seguroM2;
                     empleado.anticipoNeto = empleado.anticipo - empleado.dietas;
-
-                    // Procesar centros múltiples
                     empleado.centros = empleado.centro.split(/\s+/).filter(c => c && !isNaN(c)).map(c => parseInt(c));
-                    if (empleado.centros.length === 0) empleado.centros = [empleado.centro];
+                    if (empleado.centros.length === 0 && empleado.centro) empleado.centros = [parseInt(empleado.centro) || 0];
 
                     empleados.push(empleado);
                 }
@@ -757,14 +1013,12 @@
             const dist = {
                 departamentos: {},
                 centros: {},
-                cuentas: {}
             };
 
             empleados.forEach(emp => {
-                const numCentros = emp.centros.length;
+                const numCentros = emp.centros.length || 1;
                 const factorCentro = 1 / numCentros;
 
-                // Distribución por departamento
                 if (!dist.departamentos[emp.departamento]) {
                     dist.departamentos[emp.departamento] = {
                         irpfDin: 0,
@@ -782,7 +1036,6 @@
                 dept.baseExenta += emp.baseExenta;
                 dept.ssEmpresa += emp.ssEmpresa;
 
-                // Distribución por centro
                 emp.centros.forEach(centro => {
                     if (!dist.centros[centro]) {
                         dist.centros[centro] = {
@@ -803,7 +1056,6 @@
                 });
             });
 
-            // Calcular totales
             const totales = {
                 irpfDin: 0,
                 irpfEsp: 0,
@@ -837,8 +1089,8 @@
             document.getElementById('totalLiquido').textContent = formatCurrency(totales.liquido);
             document.getElementById('totalSSEmpresa').textContent = formatCurrency(totales.ssEmpresa);
 
-            // Mostrar distribución analítica
             const distribucion = calcularDistribucion(empleados);
+            currentDistribucion = distribucion;
             mostrarDistribucion(distribucion);
 
             summary.classList.add('visible');
@@ -848,7 +1100,6 @@
             const grid = document.getElementById('distributionGrid');
             grid.innerHTML = '';
 
-            // Card de distribución por departamentos
             const deptCard = document.createElement('div');
             deptCard.className = 'dist-card';
             deptCard.innerHTML = `
@@ -866,7 +1117,6 @@
             `;
             grid.appendChild(deptCard);
 
-            // Card de distribución por centros
             const centroCard = document.createElement('div');
             centroCard.className = 'dist-card';
             centroCard.innerHTML = `
@@ -884,7 +1134,6 @@
             `;
             grid.appendChild(centroCard);
 
-            // Card de desglose 640
             const card640 = document.createElement('div');
             card640.className = 'dist-card';
             card640.innerHTML = `
@@ -916,8 +1165,6 @@
             }).format(value) + ' €';
         }
 
-        generateBtn.addEventListener('click', generateAsiento);
-
         function generateAsiento() {
             if (!nominasData) {
                 showError('Primero debes cargar un archivo');
@@ -941,7 +1188,27 @@
                 try {
                     const asientoData = generarDatosAsiento(nominasData, fecha, referencia, diario);
                     const wb = crearExcelAsiento(asientoData);
-                    descargarExcel(wb, `Asiento_Nominas_${referencia.replace(/\s+/g, '_')}.xlsx`);
+                    const filename = `Asiento_Nominas_${referencia.replace(/\s+/g, '_')}.xlsx`;
+                    descargarExcel(wb, filename);
+
+                    // Guardar en histórico
+                    const totales = nominasData.reduce((acc, emp) => ({
+                        empleados: acc.empleados + 1,
+                        bruto: acc.bruto + emp.totBruto,
+                        liquido: acc.liquido + emp.totalLiq,
+                    }), { empleados: 0, bruto: 0, liquido: 0 });
+
+                    DB.addHistorico({
+                        fecha,
+                        referencia,
+                        diario,
+                        filename,
+                        empleados: totales.empleados,
+                        totalBruto: totales.bruto,
+                        totalLiquido: totales.liquido,
+                        distribucion: currentDistribucion,
+                        timestamp: new Date().toISOString()
+                    });
 
                     loading.classList.remove('visible');
                     successAlert.classList.add('visible');
@@ -968,7 +1235,6 @@
 
             const asiento = [];
 
-            // DEBE - Cuentas 640
             if (totales.irpfDin > 0) asiento.push({
                 fecha, referencia, diario,
                 cuenta: 6400000000,
@@ -1009,7 +1275,6 @@
                 empresa: null,
             });
 
-            // DEBE - Cuenta 642
             if (totales.ssEmpresa > 0) asiento.push({
                 fecha, referencia, diario,
                 cuenta: 6420000000,
@@ -1020,7 +1285,6 @@
                 empresa: null,
             });
 
-            // HABER - Cuenta 476
             if (totales.ssTotal > 0) asiento.push({
                 fecha, referencia, diario,
                 cuenta: 4760000000,
@@ -1031,7 +1295,6 @@
                 empresa: null,
             });
 
-            // HABER - Cuentas 755
             if (totales.difSala > 0) asiento.push({
                 fecha, referencia, diario,
                 cuenta: 7550000001,
@@ -1062,7 +1325,6 @@
                 empresa: null,
             });
 
-            // HABER - Cuentas 465 individuales
             empleados.forEach(emp => {
                 const cuenta465 = 4650000000 + parseInt(emp.numero);
                 
@@ -1142,6 +1404,190 @@
             XLSX.writeFile(wb, filename);
         }
 
+        // FUNCIONES DE BASE DE DATOS DE EMPLEADOS
+        function cargarTablaEmpleados() {
+            const empleados = DB.getEmpleados();
+            const container = document.getElementById('empleadosTableContainer');
+
+            if (Object.keys(empleados).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p>No hay empleados registrados</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Importa un archivo Excel para comenzar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Departamento</th>
+                            <th>Centro(s)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.entries(empleados).forEach(([codigo, emp]) => {
+                html += `
+                    <tr>
+                        <td><span class="badge badge-info">${codigo}</span></td>
+                        <td>${DEPARTAMENTOS[emp.departamento] || 'No asignado'}</td>
+                        <td>${emp.centro || 'No asignado'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-icon" onclick="eliminarEmpleado('${codigo}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function importarEmpleados(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                    const empleados = {};
+                    let importados = 0;
+
+                    // Asumimos formato: Código | Departamento | Centro
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row[0]) continue;
+
+                        const codigo = String(row[0]).padStart(6, '0');
+                        const departamento = parseInt(row[1]) || 0;
+                        const centro = String(row[2] || '');
+
+                        empleados[codigo] = { departamento, centro };
+                        importados++;
+                    }
+
+                    DB.setEmpleados(empleados);
+                    cargarTablaEmpleados();
+
+                    document.getElementById('empleadosInfo').style.display = 'flex';
+                    document.getElementById('empleadosInfoText').textContent = 
+                        `Se han importado ${importados} empleados correctamente.`;
+
+                    setTimeout(() => {
+                        document.getElementById('empleadosInfo').style.display = 'none';
+                    }, 3000);
+
+                } catch (error) {
+                    alert('Error al importar: ' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            importEmpleadosInput.value = '';
+        }
+
+        function exportarEmpleados() {
+            const empleados = DB.getEmpleados();
+            if (Object.keys(empleados).length === 0) {
+                alert('No hay empleados para exportar');
+                return;
+            }
+
+            const data = [
+                ['Código Empleado', 'Departamento', 'Centro']
+            ];
+
+            Object.entries(empleados).forEach(([codigo, emp]) => {
+                data.push([codigo, emp.departamento, emp.centro]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
+            XLSX.writeFile(wb, 'Empleados_Charo_Ruiz.xlsx');
+        }
+
+        function eliminarEmpleado(codigo) {
+            if (!confirm(`¿Eliminar empleado ${codigo}?`)) return;
+            
+            const empleados = DB.getEmpleados();
+            delete empleados[codigo];
+            DB.setEmpleados(empleados);
+            cargarTablaEmpleados();
+        }
+
+        // FUNCIONES DE HISTÓRICO
+        function cargarHistorico() {
+            const historico = DB.getHistorico();
+            const container = document.getElementById('historicoContainer');
+
+            if (historico.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📜</div>
+                        <p>No hay asientos generados</p>
+                        <p style="font-size: 14px; margin-top: 8px;">El histórico aparecerá aquí cuando generes asientos</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Referencia</th>
+                            <th>Empleados</th>
+                            <th>Total Bruto</th>
+                            <th>Generado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            historico.forEach((entry, index) => {
+                const fecha = new Date(entry.timestamp);
+                html += `
+                    <tr>
+                        <td>${entry.fecha}</td>
+                        <td><strong>${entry.referencia}</strong></td>
+                        <td>${entry.empleados}</td>
+                        <td>${formatCurrency(entry.totalBruto)}</td>
+                        <td>${fecha.toLocaleDateString('es-ES')} ${fecha.toLocaleTimeString('es-ES')}</td>
+                        <td><span class="badge badge-success">✓ Generado</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function limpiarHistorico() {
+            if (!confirm('¿Estás seguro de que quieres limpiar todo el histórico?')) return;
+            DB.clearHistorico();
+            cargarHistorico();
+        }
+
+        // UTILIDADES
         function showError(msg) {
             errorMessage.textContent = msg;
             errorAlert.classList.add('visible');
@@ -1150,6 +1596,9 @@
         function hideError() {
             errorAlert.classList.remove('visible');
         }
+
+        // Cargar tabla de empleados al inicio
+        cargarTablaEmpleados();
     </script>
 </body>
 </html>
